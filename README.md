@@ -25,6 +25,7 @@ For the AngularJS shop front code, which in turn is a fork from Bernado Castilho
 PureCSS
 -------
 For the CSS layout (Photo Gallery and Landing Page).
+Saved to public css folder from http://yui.yahooapis.com/pure/0.3.0/pure-min.css to ensure https access.
 
 Stripe Shop
 -----------
