@@ -56,8 +56,8 @@ app.post('/pay', function(req, res) {
     return Stripe.Charges.create({
       amount: order.calculateAmount(),
       description: order.get('name') +
-        ' <' + order.get('email') + ' > - Shop T-Shirt Order',
-      currency: 'usd',
+        ' <' + order.get('email') + ' > - Sintamani',
+      currency: 'gbp',
       customer: customer.id
     });
   }).then(function(charge) {
