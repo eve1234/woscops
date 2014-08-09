@@ -16,11 +16,13 @@ chargeurl: "https://localhost:1234/processStripe.aspx" //
 Note the PayPal and Google buttons have been commented out (so unavailable in default site).
 2. Update partials/store.htm and partials/product.htm to change the DEL1 (International Delivery) cost in all mentions of:
 ng-click="cart.addItem('DEL1', 'International Delivery', 7, 1)" <!--where 7 is cost in GBP and DEL1 is sku for delivery charge.!-->
-Deploy to Parse cloud.
 3. Update js/store.js with all items in inventory in format:
 new product(sku, "name", "dimensions", "materials", "finish", "description", price) //where sku is the product code and price in GBP (without "" for these 2 items).
 Note these descriptive terms can be changed, as per original angularjs-cart for non-jewellery descriptions on the product.js and product.htm pages.
-
+4. Update js/shoppingCart.js to replace private details at:
+    StripeCheckout.open({
+    });
+X. Deploy to Parse cloud with "parse deploy".
 
 Acknowledgements
 ================
