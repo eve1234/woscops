@@ -20,7 +20,7 @@ Based on the following...
 
 AngularJS Shopping Cart
 -----------------------
-For the AngularJS shop front code, which in turn is a fork from Bernado Castilho's sample on Code Project.
+For the AngularJS shop front code, which in turn is a fork from Bernado Castilho's sample on Code Project. Renamed ShoppingCart to public to simplify deploying to Parse cloud.
 
 PureCSS
 -------
