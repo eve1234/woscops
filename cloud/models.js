@@ -1,8 +1,8 @@
 var config = require('cloud/config')
   , Order = Parse.Object.extend('Order')
-  , orderTypeRegex = /^[UW]$/
-  , orderColorRegex = /^[G]$/
-  , orderSizeRegex = /^(S|M|L|XL|2XL)$/
+//  , orderTypeRegex = /^[UW]$/
+//  , orderColorRegex = /^[G]$/
+//  , orderSizeRegex = /^(S|M|L|XL|2XL)$/
   ;
 
 function getError(spec, name, value) {
@@ -56,7 +56,7 @@ function orderError(serializedOrder) {
     else if (!(typeof(type) == 'string') || !type.match(orderTypeRegex))
       return 'Your order has an invalid type for one item.';
     else if (!(typeof(color) == 'string') || !color.match(orderColorRegex))
-      return 'Your order has an invalid type for one item.';
+      return 'Your order has an invalid color for one item.';
     else if (!(typeof(size) == 'string') || !size.match(orderSizeRegex))
       return 'Your order has an invalid size for one item.';
     else if (!(typeof(quantity) == 'number') || quantity == 0)
