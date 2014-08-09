@@ -1,22 +1,21 @@
-﻿<p class="text-info">
-    Thanks for shopping at the Angular Store.<br />
-    This is your shopping cart. Here you can edit the items, 
-    go back to the store, clear the cart, or check out.
-</p>
-
-<div class="container-fluid">
-    <div class="row-fluid">
-        <div class="span8">
+<div class="splash">
+ <div class="l-box">
+  <h2>Shopping Cart</h2>
+ </div>
+</div>
+    <div class="content">
+        <div class="pure-g-r">
+            <div class="pure-u-3-4 l-box">
 
             <!-- items -->
-            <table class="table table-bordered">
+            <table class="pure-table pure-table-horizontal">
 
                 <!-- header -->
-                <tr class="well">
-                    <td><b>Item</b></td>
-                    <td class="tdCenter"><b>Quantity</b></td>
-                    <td class="tdRight"><b>Price</b></td>
-                    <td />
+                <thead>
+                    <th><b>Item</b></td>
+                    <th class="thCenter"><b>Quantity</b></td>
+                    <th class="thCenter"><b>Price</b></td>
+                    <th class="thCenter"><b>Remove</b></td>
                 </tr>
 
                 <!-- empty cart message -->
@@ -30,26 +29,27 @@
                 <tr ng-repeat="item in cart.items | orderBy:'name'">
                     <td>{{item.name}}</td>
                     <td class="tdCenter">
-                      <div class="input-append">
+                        <form class="pure-form">
                         <!-- use type=tel instead of  to prevent spinners -->
                         <input
-                            class="span3 text-center" type="tel" 
+                            class="pure-input-3-4" type="text"
                             ng-model="item.quantity" 
                             ng-change="cart.saveItems()" />
                         <button 
-                            class="btn btn-success" type="button" 
-                            ng-disabled="item.quantity >= 1000"
+                            class="pure-button primary-button" type="button" 
+                            ng-disabled="item.quantity >= 10"
                             ng-click="cart.addItem(item.sku, item.name, item.price, +1)">+</button>
                         <button 
-                            class="btn btn-inverse" type="button" 
+                            class="pure-button secondary-button" type="button" 
                             ng-disabled="item.quantity <= 1"
                             ng-click="cart.addItem(item.sku, item.name, item.price, -1)">-</button>
-                      </div>
+                    </form>
+
                     </td>
-                    <td class="tdRight">{{item.price * item.quantity | currency}}</td>
-                    <td class="tdCenter" title="remove from cart">
-                        <a href="" ng-click="cart.addItem(item.sku, item.name, item.price, -10000000)" >
-                            <i class="icon-remove" />
+                    <td class="tdCenter">{{item.price * item.quantity | currency:"£"}}</td>
+                    <td class="tdCenter" title="Remove from Cart">
+                        <a class="pure-button tertiary-button" href="" ng-click="cart.addItem(item.sku, item.name, item.price, -10000000)" >
+                            <i class="fa-trash-o"> </i>x
                         </a>
                     </td>
                 </tr>
@@ -58,56 +58,57 @@
                 <tr class="well">
                     <td><b>Total</b></td>
                     <td class="tdCenter"><b>{{cart.getTotalCount()}}</b></td>
-                    <td class="tdRight"><b>{{cart.getTotalPrice() | currency}}</b></td>
+                    <td class="tdRight"><b>{{cart.getTotalPrice() | currency:"£"}}</b></td>
                     <td />
                 </tr>
             </table>
         </div>
 
+
         <!-- buttons -->
-        <div class="span4">
-            <p class="text-info">
+            <div class="pure-u-1-4 l-box">
                 <button 
-                    class="btn btn-block" 
+                    class="pure-button secondary-button" 
+                    style="display: block; width: 100%;"
                     onclick="window.location.href='default.htm'">
-                    <i class="icon-chevron-left" /> back to store
+                    <i class="icon-chevron-left" /> Back to Shop
                 </button>
+            <br />
                 <button 
-                    class="btn btn-block btn-danger" 
+                    class="pure-button tertiary-button" 
+                    style="display: block; width: 100%;"
                     ng-click="cart.clearItems()" 
                     ng-disabled="cart.getTotalCount() < 1" >
-                    <i class="icon-trash icon-white" /> clear cart
+                    <i class="icon-trash icon-white" /> Empty Cart
                 </button>
-            </p>
 
             <br /><br />
 
-            <p class="text-info">
-                <button
+<!--                 <button
                     class="btn btn-block btn-primary"
                     ng-click="cart.checkout('PayPal')"
                     ng-disabled="cart.getTotalCount() < 1">
                     <i class="icon-ok icon-white" /> check out using PayPal
-                </button>
+                </button><br>
                 <button 
                     class="btn btn-block btn-primary" 
                     ng-click="cart.checkout('Google')" 
                     ng-disabled="cart.getTotalCount() < 1">
                     <i class="icon-ok icon-white" /> check out using Google
-                </button>
+                </button><br> -->
                 <button 
-                    class="btn btn-block btn-primary" 
+                    class="pure-button primary-button" 
+                    style="display: block; width: 100%;"
                     ng-click="cart.checkout('Stripe')" 
                     ng-disabled="cart.getTotalCount() < 1">
-                    <i class="icon-ok icon-white" /> check out using Stripe
+                    <i class="icon-ok icon-white" /> Pay Now
                 </button>
-            </p>
+
                 <!-- Stripe needs a form to post to -->
                 <form class="form-stripe"></form>
 
-            <br /><br />
 
-            <p class="text-info">
+<!--            <p class="text-info">
                 <button 
                     class="btn btn-block btn-link"
                     ng-click="cart.checkout('PayPal')"
@@ -120,7 +121,11 @@
                     ng-disabled="cart.getTotalCount() < 1" >
                     <img src="https://checkout.google.com/buttons/checkout.gif?w=168&h=44&style=white&variant=text" alt="checkoutGoogle"/>
                 </button>    
-            </p>
+            </p> -->
         </div>
+    </div>
+
+    <div class="ribbon l-box">
+Free UK Delivery. Please add international delivery charge from shop for all delivery addresses outside mainland UK.
     </div>
 </div>
