@@ -2,8 +2,8 @@
 var Stripe = require('stripe');
 Stripe.initialize('');
 
-// var Mailgun = require('mailgun');
-// Mailgun.initialize("", "");
+var Mailgun = require('mailgun');
+Mailgun.initialize("", "");
 
 /*
  * Purchase an item from the Parse Store using the Stripe
@@ -45,6 +45,30 @@ Parse.Cloud.define("purchaseItem", function(request, response) {
       return Parse.Promise.error('Sorry, this item is no longer available.');
     });
 
+  }).then(function(result) {
+    // Make sure we found an item and that it's not out of stock.
+    if (!result) {
+      return Parse.Promise.error('Sorry, this item is no longer available.');
+    } else if (result.get('quantityAvailable') <= 0) { // Cannot be 0
+      return Parse.Promise.error('Sorry, this item is out of stock.');
+    }
+
+    // Decrease the quantity.
+    item = result;
+    item.increment('quantityAvailable', -1);
+
+    // Save item.
+    return item.save().then(null, function(error) {
+      console.log('Decrementing quantity failed. Error: ' + error);
+      return Parse.Promise.error('An error has occurred. Your credit card was not charged.');
+    });
+
+  }).then(function(result) {
+    // Make sure a concurrent request didn't take the last item.
+    item = result;
+    if (item.get('quantityAvailable') < 0) { // can be 0 if we took the last
+      return Parse.Promise.error('Sorry, this item is out of stock.');
+    }
 
     // We have items left! Let's create our order item before 
     // charging the credit card (just to be safe).
@@ -71,7 +95,7 @@ Parse.Cloud.define("purchaseItem", function(request, response) {
     // Now we can charge the credit card using Stripe and the credit card token.
     return Stripe.Charges.create({
       amount: item.get('price') * 100, // express dollars in cents 
-      currency: 'gbp',
+      currency: 'usd',
       card: request.params.cardToken
     }).then(null, function(error) {
       console.log('Charging with stripe failed. Error: ' + error);
