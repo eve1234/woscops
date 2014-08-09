@@ -293,12 +293,14 @@ shoppingCart.prototype.checkoutStripe = function (parms, clearCart) {
 
     StripeCheckout.open({
         key: parms.merchantID,
-        address: false,
+        address: true,
+	// zipCode: true,
         amount: this.getTotalPrice() *100, /** expects an integer **/
         currency: 'gbp',
-        name: 'Purchase',
-        description: 'Description',
-        panelLabel: 'Checkout',
+        name: 'Sintamani',
+        description: 'Designer Jewellery',
+        panelLabel: 'Pay',
+	allowRememberMe: true,
         token: token
     });
 }
