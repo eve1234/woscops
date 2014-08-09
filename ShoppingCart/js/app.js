@@ -60,7 +60,7 @@ storeApp.factory("DataService", function () {
     // shopping cart with Stripe, you have to create a merchant account with 
     // Stripe. You can do that here:
     // https://manage.stripe.com/register
-    myCart.addCheckoutParameters("Stripe", "pk_test_xxxx",
+    myCart.addCheckoutParameters("Stripe", "pk_test_9pYx4CRGRbdxI2RYHh7l3ESa",
         {
             chargeurl: "https://localhost:1234/processStripe.aspx"
         }
