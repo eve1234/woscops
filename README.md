@@ -27,6 +27,9 @@ Note these descriptive terms can be changed, as per original angularjs-cart for 
 5. Update js/app.js to replace with your own private Parse ("Application_ID", "Javascript_Key") from your Parse dashboard for the app at:
 Parse.initialize("G9tIKERUlFyorzzQbnhw74tPPeu9FEOPDGc3qTvl", "xGYU8Jv5mdVK6q3zyd6APcfoi7JvInIeE8Qdfy6y");
 6. Copy config/global.json to config/local.json and add the Parse Application ID and Master Key to config/local.json
+7. Update cloud/main.js with your shop name instead of Designer Shop at:
+        ' <' + order.get('email') + ' > - Designer Shop',
+X. You may want to change gbp (currency) in various js files (public and cloud) to usd etc if not in UK.
 X. Deploy to Parse cloud with "parse deploy".
 
 Acknowledgements
