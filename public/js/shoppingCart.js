@@ -260,7 +260,9 @@ shoppingCart.prototype.checkoutStripe = function (parms, clearCart) {
     // First, you have to initialize the Stripe API w/ your public/private keys.
     // You then call Customer.create() w/ the stripeToken and your email address.
     // Then you call Charge.create() w/ the customer ID from the previous call and your charge amount.
-    form.attr("action", parms.options['chargeurl']);
+    // Original command
+    // form.attr("action", parms.options['chargeurl']);
+    form.attr("action");
     form.attr("method", "POST");
     form.attr("style", "display:none;");
     this.addFormFields(form, data);
@@ -298,7 +300,7 @@ shoppingCart.prototype.checkoutStripe = function (parms, clearCart) {
         amount: this.getTotalPrice() *100, /** expects an integer **/
         currency: 'gbp',
         name: 'Shop Name',
-        description: 'Designer Shop',
+        description: 'Designer Sales',
         panelLabel: 'Pay',
 	allowRememberMe: true,
         token: token
