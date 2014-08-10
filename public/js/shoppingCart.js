@@ -297,8 +297,8 @@ shoppingCart.prototype.checkoutStripe = function (parms, clearCart) {
 	// zipCode: true,
         amount: this.getTotalPrice() *100, /** expects an integer **/
         currency: 'gbp',
-        name: 'Sintamani',
-        description: 'Designer Jewellery',
+        name: 'Shop Name',
+        description: 'Designer Shop',
         panelLabel: 'Pay',
 	allowRememberMe: true,
         token: token
