@@ -9,7 +9,7 @@ var config = {
     price_per_PCH: 7,
     price_per_PER: 8,
     price_per_FIG: 5,
-
+    price_per_DEL1: 7,
 
     // Set to your Stripe publishable key. (The one here is for a test
     // account, which may or may not be working.)
