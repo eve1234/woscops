@@ -1,142 +1,75 @@
-/* Initialize the Stripe and Mailgun Cloud Modules */
-var Stripe = require('stripe');
-Stripe.initialize('');
+var Stripe = require('stripe')
+  , express = require('express')
+  , app = express()
+  , path = require('path')
+  , models = require('cloud/models')
+  , config = require('cloud/config')
+  ;
 
-// var Mailgun = require('mailgun');
-// Mailgun.initialize("", "");
+Stripe.initialize(config.stripe_secret_key);
 
-/*
- * Purchase an item from the Parse Store using the Stripe
- * Cloud Module.
- *
- * Expected input (in request.params):
- *   itemName       : String, can be "Mug, "Tshirt" or "Hoodie"
- *   size           : String, optional for items like the mug 
- *   cardToken      : String, the credit card token returned to the client from Stripe
- *   name           : String, the buyer's name
- *   email          : String, the buyer's email address
- *   address        : String, the buyer's street address
- *   city_state     : String, the buyer's city and state
- *   zip            : String, the buyer's zip code
- *
- * Also, please note that on success, "Success" will be returned. 
- */
-Parse.Cloud.define("purchaseItem", function(request, response) {
-  // The Item and Order tables are completely locked down. We 
-  // ensure only Cloud Code can get access by using the master key.
-  Parse.Cloud.useMasterKey();
+app.set('views', 'cloud/views');
+app.set('view engine', 'ejs');
+app.use(express.bodyParser());
+app.use(express.cookieParser());
+app.use(express.cookieSession({
+  secret: config.secret,
+  cookie: { httpOnly: true }
+}));
+app.use(express.csrf());
+app.use(function(req, res, next) {
+  res.locals.csrf_field = req.session._csrf;
+  next();
+});
 
-  // Top level variables used in the promise chain. Unlike callbacks,
-  // each link in the chain of promise has a separate context.
-  var item, order;
-
-  // We start in the context of a promise to keep all the
-  // asynchronous code consistent. This is not required.
-  Parse.Promise.as().then(function() {
-    // Find the item to purchase.
-    var itemQuery = new Parse.Query('Item');
-    itemQuery.equalTo('name', request.params.itemName);
-
-    // Find the resuts. We handle the error here so our
-    // handlers don't conflict when the error propagates.
-    // Notice we do this for all asynchronous calls since we
-    // want to handle the error differently each time.
-    return itemQuery.first().then(null, function(error) {
-      return Parse.Promise.error('Sorry, this item is no longer available.');
-    });
-
-
-    // We have items left! Let's create our order item before 
-    // charging the credit card (just to be safe).
-    order = new Parse.Object('Order');
-    order.set('name', request.params.name);
-    order.set('email', request.params.email);
-    order.set('address', request.params.address);
-    order.set('zip', request.params.zip);
-    order.set('city_state', request.params.city);
-    order.set('item', item);
-    order.set('size', request.params.size || 'N/A');
-    order.set('fulfilled', false);
-    order.set('charged', false); // set to false until we actually charge the card
-
-    // Create new order
-    return order.save().then(null, function(error) {
-      // This would be a good place to replenish the quantity we've removed.
-      // We've ommited this step in this app.
-      console.log('Creating order object failed. Error: ' + error);
-      return Parse.Promise.error('An error has occurred. Your credit card was not charged.');
-    });
-
-  }).then(function(order) { 
-    // Now we can charge the credit card using Stripe and the credit card token.
-    return Stripe.Charges.create({
-      amount: item.get('price') * 100, // express dollars in cents 
-      currency: 'gbp',
-      card: request.params.cardToken
-    }).then(null, function(error) {
-      console.log('Charging with stripe failed. Error: ' + error);
-      return Parse.Promise.error('An error has occurred. Your credit card was not charged.');
-    });
-
-  }).then(function(purchase) {
-    // Credit card charged! Now we save the ID of the purchase on our
-    // order and mark it as 'charged'.
-    order.set('stripePaymentId', purchase.id);
-    order.set('charged', true);
-
-    // Save updated order
-    return order.save().then(null, function(error) {
-      // This is the worst place to fail since the card was charged but the order's
-      // 'charged' field was not set. Here we need the user to contact us and give us
-      // details of their credit card (last 4 digits) and we can then find the payment
-      // on Stripe's dashboard to confirm which order to rectify. 
-      return Parse.Promise.error('A critical error has occurred with your order. Please ' + 
-                                 'contact store@parse.com at your earliest convinience. ');
-    });
-
-  }).then(function(order) {
-    // Credit card charged and order item updated properly!
-    // We're done, so let's send an email to the user.
-
-    // Generate the email body string.
-    var body = "We've received and processed your order for the following item: \n\n" +
-               "Item: " + request.params.itemName + "\n";
-
-    if (request.params.size && request.params.size !== "N/A") {
-      body += "Size: " + request.params.size + "\n";
-    }
-
-    body += "\nPrice: $" + item.get('price') + ".00 \n" +
-            "Shipping Address: \n" +
-            request.params.name + "\n" +
-            request.params.address + "\n" +
-            request.params.city_state + "," +
-            "United States, " + request.params.zip + "\n" +
-            "\nWe will send your item as soon as possible. " + 
-            "Let us know if you have any questions!\n\n" +
-            "Thank you,\n" +
-            "The Parse Team";
-
-    // Send the email.
-    return Mailgun.sendEmail({
-      to: request.params.email,
-      from: 'store@parse.com',
-      subject: 'Your order for a Parse ' + request.params.itemName + ' was successful!',
-      text: body
-    }).then(null, function(error) {
-      return Parse.Promise.error('Your purchase was successful, but we were not able to ' +
-                                 'send you an email. Contact us at store@parse.com if ' +
-                                 'you have any questions.');
-    });
-
-  }).then(function() {
-    // And we're done!
-    response.success('Success');
-
-  // Any promise that throws an error will propagate to this handler.
-  // We use it to return the error from our Cloud Function using the 
-  // message we individually crafted based on the failure above.
-  }, function(error) {
-    response.error(error);
+app.get('/', function(req, res) {
+  res.render('index', {
+    config: config
   });
 });
+
+app.post('/pay', function(req, res) {
+  var order = new models.Order()
+    , token = null;
+
+  for (param in models.Order.schema) {
+    order.set(param, req.body[param]);
+  }
+
+  // Coerce to a string out of paranoia
+  Stripe.Tokens.retrieve(req.body.stripe_token + '').then(function(result) {
+    token = result
+    if (!token.email) {
+      return Parse.Promise.error('You did not provide an email address.\n');
+    }
+
+    order.set('email', token.email);
+    order.set('state', 'unpaid');
+    return order.save();
+  }).then(function(order) {
+    return Stripe.Customers.create({
+      description: order.get('name'),
+      email: token.email,
+      card: token.id
+    })
+  }).then(function(customer) {
+    return Stripe.Charges.create({
+      amount: order.calculateAmount(),
+      description: order.get('name') +
+        ' <' + order.get('email') + ' > - Sintamani',
+      currency: 'gbp',
+      customer: customer.id
+    });
+  }).then(function(charge) {
+    order.set('charge_id', charge.id);
+    order.set('state', 'paid');
+    return order.save();
+  }).then(function(order) {
+    res.send('Success!\n');
+  }, function(error) {
+    console.log(error);
+    res.send(400, error.message + '\n');
+  })
+});
+
+app.listen();
