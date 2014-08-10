@@ -11,6 +11,8 @@ This is currently (Aug 2014) non-functional, so any coding help gratefully recei
 
 Usage
 -----
+First create accounts with the Services listed below (Stripe.com, Parse.com), which you need to edit the files below.
+Then:
 1. Update public/app.js with your own Stripe pk_ID (currently includes a test Stripe acount that may or may not work). Update line:
 chargeurl: "https://localhost:1234/processStripe.aspx" // 
 Note the PayPal and Google buttons have been commented out (so unavailable in default site).
@@ -22,6 +24,8 @@ Note these descriptive terms can be changed, as per original angularjs-cart for 
 4. Update js/shoppingCart.js to replace private details at:
     StripeCheckout.open({
     });
+5. Update js/app.js to replace with your own private Parse ("Application_ID", "Javascript_Key") from your Parse dashboard for the app at:
+Parse.initialize("G9tIKERUlFyorzzQbnhw74tPPeu9FEOPDGc3qTvl", "xGYU8Jv5mdVK6q3zyd6APcfoi7JvInIeE8Qdfy6y");
 X. Deploy to Parse cloud with "parse deploy".
 
 Acknowledgements
