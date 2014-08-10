@@ -1,75 +1,18 @@
-var Stripe = require('stripe')
-  , express = require('express')
-  , app = express()
-  , path = require('path')
-  , models = require('cloud/models')
-  , config = require('cloud/config')
-  ;
+/* Initialize the Stripe and Mailgun Cloud Modules */
+var Stripe = require('stripe');
+Stripe.initialize('sk_test_Y1LbAUutnGnPFT8s3XWURq1y');
 
-Stripe.initialize(config.stripe_secret_key);
+// This is a test-bed below at present.... Not working. And doesn't get correct prices etc.
 
-app.set('views', 'cloud/views');
-app.set('view engine', 'ejs');
-app.use(express.bodyParser());
-app.use(express.cookieParser());
-app.use(express.cookieSession({
-  secret: config.secret,
-  cookie: { httpOnly: true }
-}));
-app.use(express.csrf());
-app.use(function(req, res, next) {
-  res.locals.csrf_field = req.session._csrf;
-  next();
-});
-
-app.get('/', function(req, res) {
-  res.render('index', {
-    config: config
-  });
-});
-
-app.post('/pay', function(req, res) {
-  var order = new models.Order()
-    , token = null;
-
-  for (param in models.Order.schema) {
-    order.set(param, req.body[param]);
+Stripe.Charges.create({
+  amount: 100 * 10, // $10 expressed in cents
+  currency: "gbp",
+  card: data.cardToken // the token id should be sent from the client
+},{
+  success: function(httpResponse) {
+    response.success("Purchase made!");
+  },
+  error: function(httpResponse) {
+    response.error("Uh oh, something went wrong");
   }
-
-  // Coerce to a string out of paranoia
-  Stripe.Tokens.retrieve(req.body.stripe_token + '').then(function(result) {
-    token = result
-    if (!token.email) {
-      return Parse.Promise.error('You did not provide an email address.\n');
-    }
-
-    order.set('email', token.email);
-    order.set('state', 'unpaid');
-    return order.save();
-  }).then(function(order) {
-    return Stripe.Customers.create({
-      description: order.get('name'),
-      email: token.email,
-      card: token.id
-    })
-  }).then(function(customer) {
-    return Stripe.Charges.create({
-      amount: order.calculateAmount(),
-      description: order.get('name') +
-        ' <' + order.get('email') + ' > - Sintamani',
-      currency: 'gbp',
-      customer: customer.id
-    });
-  }).then(function(charge) {
-    order.set('charge_id', charge.id);
-    order.set('state', 'paid');
-    return order.save();
-  }).then(function(order) {
-    res.send('Success!\n');
-  }, function(error) {
-    console.log(error);
-    res.send(400, error.message + '\n');
-  })
 });
-
-app.listen();
