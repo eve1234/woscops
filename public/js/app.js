@@ -1,8 +1,5 @@
 'use strict';
 
-// Parse Application ID and Javascript Key
-Parse.initialize("G9tIKERUlFyorzzQbnhw74tPPeu9FEOPDGc3qTvl", "xGYU8Jv5mdVK6q3zyd6APcfoi7JvInIeE8Qdfy6y");
-
 // App Module: the name AngularStore matches the ng-app attribute in the main <html> tag
 // the route provides parses the URL and injects the appropriate partial page
 var storeApp = angular.module('AngularStore', []).
